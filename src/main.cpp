@@ -1,7 +1,9 @@
 #include <chrono>
 #include <iostream>
+#include <fstream>
 #include <memory>
 #include <uv.h>
+#include <unistd.h>
 
 #include <cxxopts.hpp>
 
@@ -48,7 +50,9 @@ int main(int argc, char **argv) {
         // and simplify validation below
         options.add_options()("s,storage", "Type of storage service to use", cxxopts::value<std::string>());
         options.add_options()("n,network", "Type of network service to use", cxxopts::value<std::string>());
+        options.add_options()("p,pid", "Write PID to file", cxxopts::value<std::string>());
         options.add_options()("h,help", "Print usage info");
+        options.add_options()("d,daemon", "Run as a deamon");
         options.parse(argc, argv);
 
         if (options.count("help") > 0) {
@@ -68,6 +72,31 @@ int main(int argc, char **argv) {
     std::string storage_type = "map_global";
     if (options.count("storage") > 0) {
         storage_type = options["storage"].as<std::string>();
+    }
+
+    if (options.count("daemon") > 0) {
+	pid_t pid = fork();
+	
+	if (!pid){
+		setsid();
+		close(0);
+		close(1);
+		close(2);
+	}
+
+	else {
+	return 0;
+	}
+    }
+
+    if (options.count("pid") > 0) {
+	std::string file_pid = options["pid"].as<std::string>();
+	pid_t pid = getpid();
+	std::ofstream fstr;
+	fstr.open(file_pid);
+	if (fstr.is_open()){
+	    fstr<<pid<<"\n";
+	}
     }
 
     if (storage_type == "map_global") {
