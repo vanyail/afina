@@ -1,12 +1,10 @@
 #include <chrono>
 #include <iostream>
-#include <fstream>
 #include <memory>
 #include <uv.h>
 #include <unistd.h>
-
 #include <cxxopts.hpp>
-
+#include <fstream>
 #include <afina/Storage.h>
 #include <afina/Version.h>
 #include <afina/network/Server.h>
@@ -76,7 +74,7 @@ int main(int argc, char **argv) {
 
     if (options.count("daemon") > 0) {
 	pid_t pid = fork();
-	
+
 	if (!pid){
 		setsid();
 		close(0);
