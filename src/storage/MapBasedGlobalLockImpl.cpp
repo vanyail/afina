@@ -18,6 +18,7 @@ bool MapBasedGlobalLockImpl::Put(const std::string &key, const std::string &valu
 	else if ( _max_size == _order.size() ) {
 		std::string buf = _order.back();
 		_order.pop_back();
+		_backend.erase(buf);
 		_order.push_front(key);
 		_backend[key] = value;
 		}
@@ -36,7 +37,8 @@ bool MapBasedGlobalLockImpl::PutIfAbsent(const std::string &key, const std::stri
 	if ( _backend.find(key) == _backend.end() ) {
 		if ( _max_size == _order.size() ) {
 		std::string buf = _order.back();
-		_order.pop_back();
+		_backend.erase(buf);
+		_order.pop_back();		
 		_order.push_front(key);
 		_backend[key] = value;
 		}
